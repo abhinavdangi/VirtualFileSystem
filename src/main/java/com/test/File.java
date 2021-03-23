@@ -25,7 +25,7 @@ public class File {
 
     public String read() {
         StringBuilder content = new StringBuilder();
-        for(Block block: blocks){
+        for (Block block : blocks) {
             content.append(new String(block.getContent(), StandardCharsets.UTF_8));
         }
         return content.toString();
@@ -33,18 +33,21 @@ public class File {
 
     public void write(String content) {
         Integer contentLength = content.getBytes().length;
-        if(!FileSystem.isMemoryAvailable(contentLength)){
+        if (!FileSystem.isMemoryAvailable(contentLength)) {
             throw new RuntimeException("No memory space available");
-        }
-        else {
-            Integer blockLength = contentLength/FileSystem.memoryBlockSize;
-            if(contentLength%FileSystem.memoryBlockSize != 0)
+        } else {
+            Integer blockLength = contentLength / FileSystem.memoryBlockSize;
+            if (contentLength % FileSystem.memoryBlockSize != 0) {
                 blockLength++;
-            for(int i=0; i<blockLength; i++){
-                Block block = new Block(FileSystem.currentBlock, Arrays.copyOfRange(content.getBytes(),i,i+FileSystem.memoryBlockSize));
+            }
+            for (int i = 0; i < blockLength; i++) {
+                Integer toLength = Math.min((i + 1) * FileSystem.memoryBlockSize, contentLength);
+                Block block = new Block(FileSystem.currentBlock, Arrays.copyOfRange(
+                        content.getBytes(), i * FileSystem.memoryBlockSize, toLength));
                 FileSystem.currentBlock++;
                 blocks.add(block);
             }
+            inode.setSize(contentLength);
         }
     }
 }

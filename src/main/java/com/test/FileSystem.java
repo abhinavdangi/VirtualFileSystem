@@ -19,7 +19,7 @@ public class FileSystem {
         files = new HashMap<>();
         FileSystem.memoryBlockSize = memoryBlockSize;
         usedBlocks = 0;
-        totalBlocks = Math.toIntExact(Runtime.getRuntime().totalMemory()/memoryBlockSize);
+        totalBlocks = Math.toIntExact(Runtime.getRuntime().totalMemory() / memoryBlockSize);
         currentBlock = 0;
     }
 
@@ -28,13 +28,13 @@ public class FileSystem {
         return usedBlocks + (contentLength / memoryBlockSize) < totalBlocks;
     }
 
-    private static void refreshUsedBlocks(){
-        for(File file : files.values()){
+    private static void refreshUsedBlocks() {
+        for (File file : files.values()) {
             usedBlocks += file.getBlocks().size();
         }
     }
 
-    File newFile(String path){
+    File newFile(String path) {
         File file = new File(path);
         files.put(path, file);
         return file;

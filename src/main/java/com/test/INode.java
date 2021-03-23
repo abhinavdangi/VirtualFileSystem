@@ -9,8 +9,8 @@ class INode {
 
     INode(String path) {
         this.size = 0;
-        String[] paths =  path.split("/");
-        this.name = paths[paths.length-1];
+        String[] paths = path.split("/");
+        this.name = paths[paths.length - 1];
     }
 
     private Integer size;
