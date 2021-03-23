@@ -19,19 +19,25 @@ public class FileSystem {
 
     void fOpen(String path){
         File file = files.get(path);
-        
+        file.setOpen(true);
     }
 
-    void fClose(){
-
+    void fClose(String path){
+        File file = files.get(path);
+        file.setOpen(false);
     }
 
-    void fWrite(){
-
+    void fWrite(String path, String content){
+        File file = files.get(path);
+        if(!file.isOpen()){
+            throw new RuntimeException("File is not open");
+        }
+        file.putContent(content);
     }
 
-    void fRead(){
-
+    String fRead(String path){
+        File file = files.get(path);
+        return file.getContent();
     }
 
     void newFile(String path){
