@@ -1,48 +1,43 @@
 package com.test;
 
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class FileSystem {
 
-    HashMap<String, File> files;
-    List<Integer> memoryBlocks;
+    public static int currentBlock;
+    static Map<String, File> files;
+    static Integer memoryBlockSize;
+    static Integer usedBlocks;
+    static Integer totalBlocks;
 
     public FileSystem(int memoryBlockSize) {
-        long totalMemory = Runtime.getRuntime().totalMemory();
-        System.out.println(totalMemory);
-        System.out.println(totalMemory/memoryBlockSize);
-        memoryBlocks = new ArrayList<>();
+        files = new HashMap<>();
+        FileSystem.memoryBlockSize = memoryBlockSize;
+        usedBlocks = 0;
+        totalBlocks = Math.toIntExact(Runtime.getRuntime().totalMemory()/memoryBlockSize);
+        currentBlock = 0;
     }
 
-    void fOpen(String path){
-        File file = files.get(path);
-        file.setOpen(true);
+    static boolean isMemoryAvailable(Integer contentLength) {
+        refreshUsedBlocks();
+        return usedBlocks + (contentLength / memoryBlockSize) < totalBlocks;
     }
 
-    void fClose(String path){
-        File file = files.get(path);
-        file.setOpen(false);
-    }
-
-    void fWrite(String path, String content){
-        File file = files.get(path);
-        if(!file.isOpen()){
-            throw new RuntimeException("File is not open");
+    private static void refreshUsedBlocks(){
+        for(File file : files.values()){
+            usedBlocks += file.getBlocks().size();
         }
-        file.putContent(content);
     }
 
-    String fRead(String path){
-        File file = files.get(path);
-        return file.getContent();
-    }
-
-    void newFile(String path){
+    File newFile(String path){
         File file = new File(path);
         files.put(path, file);
+        return file;
     }
 
 }

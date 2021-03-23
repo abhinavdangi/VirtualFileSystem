@@ -1,17 +1,19 @@
 package com.test;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
-public class INode {
+@Getter
+@Setter
+class INode {
 
-    public INode() {
-        this.blocks = new ArrayList<>();
+    INode(String path) {
         this.size = 0;
+        String[] paths =  path.split("/");
+        this.name = paths[paths.length-1];
     }
 
-    private List<Integer> blocks;
-
-    private long size;
+    private Integer size;
+    private String name;
 
 }

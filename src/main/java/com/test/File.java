@@ -1,5 +1,9 @@
 package com.test;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,23 +12,39 @@ import lombok.Setter;
 public class File {
 
     public File(String path) {
-        this.inode = new INode();
+        this.inode = new INode(path);
         this.path = path;
-        this.content = "";
-        this.open = false;
+        blocks = new ArrayList<>();
     }
 
     private INode inode;
 
     private String path;
 
-    private String content;
+    private List<Block> blocks;
 
-    private boolean open;
+    public String read() {
+        StringBuilder content = new StringBuilder();
+        for(Block block: blocks){
+            content.append(new String(block.getContent(), StandardCharsets.UTF_8));
+        }
+        return content.toString();
+    }
 
-    public void putContent(String content) {
-
-        this.content += content;
-
+    public void write(String content) {
+        Integer contentLength = content.getBytes().length;
+        if(!FileSystem.isMemoryAvailable(contentLength)){
+            throw new RuntimeException("No memory space available");
+        }
+        else {
+            Integer blockLength = contentLength/FileSystem.memoryBlockSize;
+            if(contentLength%FileSystem.memoryBlockSize != 0)
+                blockLength++;
+            for(int i=0; i<blockLength; i++){
+                Block block = new Block(FileSystem.currentBlock, Arrays.copyOfRange(content.getBytes(),i,i+FileSystem.memoryBlockSize));
+                FileSystem.currentBlock++;
+                blocks.add(block);
+            }
+        }
     }
 }
